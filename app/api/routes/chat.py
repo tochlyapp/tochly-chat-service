@@ -67,7 +67,8 @@ async def get_room_messages(
                 """
                 SELECT room_id FROM user_chats_by_user 
                 WHERE team_id = %s AND room_id = %s AND user_id = %s LIMIT 1
-                """, (team_id, room_id, user_id)
+                """, 
+                (team_id, room_id, user_id)
             ).one()
         )
 

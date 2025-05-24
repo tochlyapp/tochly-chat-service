@@ -35,7 +35,7 @@ async def create_or_get_chat_room(team_id: str, user1_id: str, user2_id: str, co
             
             # Insert the room mapping for both users
             for user_id, participant_id in [(users[0], users[1]), (users[1], users[0])]:
-                session.execute(
+                asyncio.to_thread(session.execute,
                     """
                     INSERT INTO user_chats_by_user (
                         team_id, room_id, user_id, participant_id, created_at
@@ -140,9 +140,10 @@ async def get_unread_messages_count(team_id: str, room_id: str, user_id: str) ->
     count_row = await asyncio.to_thread(
         lambda: session.execute(
             """
-            SELECT COUNT(*) from direct_messages
+            SELECT COUNT(*) FROM direct_messages
             WHERE room_id = %s AND message_id > %s
-            """, (room_id, last_read_uuid)
+            """,
+            (room_id, last_read_uuid)
         ).one()
     )
 
@@ -167,10 +168,11 @@ async def handle_direct_text_message(user_id, data: SendChatMessageValidator):
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, consistency_level=ConsistencyLevel.QUORUM)
         
-        await asyncio.to_thread(session.execute(
+        await asyncio.to_thread(session.execute,
             insert_stmt, 
-            (room_id, message_id, user_id, receiver_id, message_type, content, timestamp))
+            (room_id, message_id, user_id, receiver_id, message_type, content, timestamp)
         )
+        
 
         update_stmt = """
             UPDATE user_chats_by_user
@@ -179,9 +181,9 @@ async def handle_direct_text_message(user_id, data: SendChatMessageValidator):
         """
 
         for uid in (user_id, receiver_id):
-            await asyncio.to_thread(session.execute(
+            await asyncio.to_thread(session.execute,
                 update_stmt, (content, message_type, timestamp, uid, room_id)
-            ))
+            )
 
         return {
             'room_id': room_id,
