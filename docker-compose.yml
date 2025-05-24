@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    container_name: tochly_chat_server
+    ports:
+      - "8001:8001"
+    depends_on:
+      redis:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - CONFIG_VALIDATION=strict
+  redis:
+    image: redis:7
+    container_name: tochly_redis_server
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  cassandra:
+    image: cassandra:4.1
+    container_name: tochly_cassandra_server
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+      - /Users/AhmadAmeen/schema.cql:/schema.cql:ro
+    environment:
+      - CASSANDRA_START_RPC=true
+      - CASSANDRA_CLUSTER_NAME=TochlyCluster
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  cassandra-data:
