@@ -87,7 +87,7 @@ class SendChatMessageValidator(BaseValidator):
             ]
             if missing_fields:
                 raise ValueError(
-                    f'Missing fields for non-text messages: {", ".join(missing_fields)}'
+                    f'Missing fields for non-text messages: {', '.join(missing_fields)}'
                 )
             
         return self
