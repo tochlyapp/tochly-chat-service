@@ -30,7 +30,6 @@ async def connect(sid, environ):
     try:
         await verify_cookies(cookies)
     except HTTPException:
-        print('HEREEEEEEEEEE')
         await sio.emit(
             'auth_failed', 
             {'message': 'Authentication failed. Disconnecting...'},
@@ -64,7 +63,6 @@ async def connect(sid, environ):
 
 @sio.event
 async def start_chat(sid, data):
-    print('==================================')
     try:
         sio_session = await sio.get_session(sid)
         user_id = sio_session.get('user_id') if sio_session else None
