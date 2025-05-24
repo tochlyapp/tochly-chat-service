@@ -3,10 +3,9 @@ from datetime import datetime, timezone
 from http.cookies import SimpleCookie
 from fastapi import HTTPException
 
-from app.db.cassandra import session
-
 from app.utils.jwt_utils import decode_jwt
 from app.utils.auth import verify_cookies
+from app.utils.logger import get_logger
 
 from app.sio_server import sio
 from app.services.chat import (
@@ -15,10 +14,13 @@ from app.services.chat import (
     handle_direct_text_message,
 )
 
+from app.db.cassandra import session
 from app.schemas.data_validators import (
     StartChatValidator, 
     SendChatMessageValidator
 )
+
+logger = get_logger('socketio')
 
 connected_cookies = {}
 
@@ -58,7 +60,7 @@ async def connect(sid, environ):
 
     connected_cookies[sid] = cookies
     await sio.save_session(sid, {'user_id': str(user_id)})
-    print(f'Client {sid} connected')
+    logger.info(f'Client {sid} connected')
 
 
 @sio.event
@@ -106,13 +108,13 @@ async def start_chat(sid, data):
             """, (datetime.now(timezone.utc), user_id, room_id, team_id)
         )
     except ValueError as ve:
-        print('Error400', ve)
+        logger.exception('Error 400 starting chat:', ve)
         await sio.emit('error', {
             'message': str(ve),
             'code': 400
         }, room=sid)
     except Exception as e:
-        print('Error500', e)
+        logger.exception('Error 500 starting chat:', e)
         await sio.emit('error', {
             'message': 'Internal server error',
             'code': 500,
@@ -148,16 +150,16 @@ async def send_direct_message(sid, data):
             room=room_id,
         )
     except ValueError as ve:
-        print(f'Error sending message: {ve}')
+        logger.exception(f'Error 400 sending message: {ve}')
         await sio.emit('error', {
             'message': str(ve),
             'code': 400
         }, room=sid)
     except Exception as e:
-        print(f'Error sending message: {e}')
+        logger.exception(f'Error 500 sending message: {e}')
         await sio.emit('error', {'message': 'Failed to send message.'}, to=sid)
 
 @sio.event
 async def disconnect(sid):
     connected_cookies.pop(sid, None)
-    print(f'Client disconnected: {sid}')
+    logger.info(f'Client disconnected: {sid}')

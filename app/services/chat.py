@@ -13,6 +13,10 @@ from app.services.user import fetch_user_info, fetch_user_team_membership
 from app.schemas.data_validators import SendChatMessageValidator
 from app.schemas.data_classes import RoomDetailsParams
 
+from app.utils.logger import get_logger
+
+logger = get_logger('chat')
+
 async def create_or_get_chat_room(team_id: str, user1_id: str, user2_id: str, cookies: Dict) -> str:
     try:
         users = sorted([user1_id, user2_id])
@@ -52,10 +56,10 @@ async def create_or_get_chat_room(team_id: str, user1_id: str, user2_id: str, co
 
         return room_id
     except ValueError as ve:
-        print(ve)
+        logger.exception(ve)
         raise
     except Exception as e:
-        print(f"Unexpected error in create_or_get_chat_room({user1_id}, {user2_id}): {e}")
+        logger.exception(f"Unexpected error in create_or_get_chat_room({user1_id}, {user2_id}): {e}")
         raise
 
 
@@ -114,10 +118,10 @@ async def get_room_details(params: RoomDetailsParams) -> Dict[str, Any]:
         }
 
     except ValueError as ve:
-        print(f'Validation error: {ve}')
+        logger.exception(f'Validation error: {ve}')
         raise
     except Exception as e:
-        print(f'Unexpected error in get_room_details: {e}')
+        logger.exception(f'Unexpected error in get_room_details: {e}')
         raise
 
 
@@ -168,22 +172,25 @@ async def handle_direct_text_message(user_id, data: SendChatMessageValidator):
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, consistency_level=ConsistencyLevel.QUORUM)
         
-        await asyncio.to_thread(session.execute,
-            insert_stmt, 
-            (room_id, message_id, user_id, receiver_id, message_type, content, timestamp)
-        )
-        
-
         update_stmt = """
             UPDATE user_chats_by_user
-            SET last_message = %s AND last_message_type = %s AND last_message_timestamp = %s
+            SET last_message = %s, last_message_type = %s, last_message_timestamp = %s
             WHERE user_id = %s AND room_id = %s
         """
+        
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(asyncio.to_thread(
+                session.execute,
+                insert_stmt,
+                (room_id, message_id, user_id, receiver_id, message_type, content, timestamp)
+            ))
 
-        for uid in (user_id, receiver_id):
-            await asyncio.to_thread(session.execute,
-                update_stmt, (content, message_type, timestamp, uid, room_id)
-            )
+            for uid in (user_id, receiver_id):
+                tg.create_task(asyncio.to_thread(
+                    session.execute,
+                    update_stmt,
+                    (content, message_type, timestamp, uid, room_id)
+                ))
 
         return {
             'room_id': room_id,
@@ -192,8 +199,8 @@ async def handle_direct_text_message(user_id, data: SendChatMessageValidator):
             'receiver_id': receiver_id,
             'content': content,
             'message_type': message_type,
-            'timestamp': timestamp.isoformat()
+            'timestamp': timestamp.isoformat(timespec='seconds')
         }
     except Exception as e:
-        print('Error in handle_text_message')
+        logger.exception('Error in handle_direct_text_message')
         raise

@@ -2,6 +2,9 @@ from socketio import AsyncServer
 from socketio import AsyncRedisManager
 
 from app.config.settings import settings
+from app.utils.logger import get_logger
+
+logger = get_logger('socketio')
 
 origins = settings.CORS_ORIGINS.split(',')
 redis_url = settings.REDIS_URL
@@ -18,4 +21,6 @@ sio = AsyncServer(
         'secure': 'False',
         'samesite': 'lax'
     },
+    logger=logger,
+    engineio_logger=logger,
 )
