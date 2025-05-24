@@ -15,7 +15,10 @@ from app.schemas.data_validators import QueryParams, RoomMessagesQueryParams
 router = APIRouter()
 
 @router.get('/api/chats/rooms')
-async def get_user_chat_rooms(request: Request, params: QueryParams = Depends()):
+async def get_user_chat_rooms(
+    request: Request, 
+    params: QueryParams = Depends()
+):
     try:
         cookies = request.cookies
         await verify_cookies(cookies)
@@ -49,7 +52,10 @@ async def get_user_chat_rooms(request: Request, params: QueryParams = Depends())
         )
 
 @router.get('/api/chats/rooms/{room_id}/messages')
-async def get_room_messages(request: Request, params: RoomMessagesQueryParams = Depends()):
+async def get_room_messages(
+    request: Request, 
+    params: RoomMessagesQueryParams = Depends()
+):
     try:
         cookies = request.cookies
         await verify_cookies(cookies)
