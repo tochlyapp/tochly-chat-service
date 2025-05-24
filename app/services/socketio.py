@@ -21,7 +21,6 @@ from app.schemas.data_validators import (
 )
 
 logger = get_logger('socketio')
-
 connected_cookies = {}
 
 @sio.event
