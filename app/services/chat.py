@@ -8,7 +8,7 @@ from cassandra.query import SimpleStatement
 from cassandra import ConsistencyLevel
 
 from app.db.cassandra import session
-from app.services.user import fetch_user_info, fetch_user_team_membership
+from app.services.user import fetch_member_info
 
 from app.schemas.data_validators import SendChatMessageValidator
 from app.schemas.data_classes import RoomDetailsParams
@@ -31,7 +31,7 @@ async def create_or_get_chat_room(team_id: str, user1_id: str, user2_id: str, co
         ).was_applied
 
         if applied:
-            resp = await fetch_user_team_membership(team_id, user2_id, cookies)
+            resp = await fetch_member_info(team_id, user2_id, cookies)
             if not resp:
                 raise ValueError(
                     'Could not verify participant team membership (user_id, {user2_id})'
@@ -91,7 +91,7 @@ async def get_room_details(params: RoomDetailsParams) -> Dict[str, Any]:
     try:
         async with asyncio.TaskGroup() as tg:
             participant_info_task = tg.create_task(
-                fetch_user_info(params.participant_id, params.cookies)
+                fetch_member_info(params.team_id, params.participant_id, params.cookies)
             )
             unread_count_task = tg.create_task(
                 get_unread_messages_count(params.team_id, params.room_id, params.user_id)
@@ -108,9 +108,9 @@ async def get_room_details(params: RoomDetailsParams) -> Dict[str, Any]:
         return {
             'room_id': params.room_id,
             'participant_id': params.participant_id,
-            'participant_name': participant.get('full_name', ''),
+            'participant_name': participant['display_name'],
             'is_participant_online': participant.get('online', False),
-            'participant_profile_pic': participant.get('profile_pic', ''),
+            'participant_profile_pic': participant.get('profile_picture_url', ''),
             'last_message': params.last_message,
             'last_message_type': params.last_message_type,
             'unread_messages_count': unread_count if unread_count is not None else 0,
