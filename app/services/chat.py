@@ -39,7 +39,7 @@ async def create_or_get_chat_room(team_id: str, user1_id: str, user2_id: str, co
             
             # Insert the room mapping for both users
             for user_id, participant_id in [(users[0], users[1]), (users[1], users[0])]:
-                asyncio.to_thread(session.execute,
+                await asyncio.to_thread(session.execute,
                     """
                     INSERT INTO user_chats_by_user (
                         team_id, room_id, user_id, participant_id, created_at

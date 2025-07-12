@@ -71,7 +71,7 @@ class SendChatMessageValidator(BaseValidator):
 
     @field_validator('content')
     def validate_content(cls, v, info):
-        if info.values.get('message_type') == 'text' and not v:
+        if info.data.get('message_type') == 'text' and not v:
             raise ValueError('Content is required for text messages')
         return v
     
