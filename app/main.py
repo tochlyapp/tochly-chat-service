@@ -6,14 +6,18 @@ from .sio_server import sio, origins
 from .services import socketio
 from .api.routes import chat
 
-fastapi_app = FastAPI()
+fastapi_app = FastAPI(
+    docs_url='/api/docs',
+    openapi_url='/api/openapi.json',
+    redoc_url=None
+)
 
 fastapi_app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=['*'],
+    allow_headers=['*'],
 )
 
 fastapi_app.include_router(chat.router)
