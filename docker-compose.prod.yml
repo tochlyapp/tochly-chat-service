@@ -23,6 +23,7 @@ services:
       - "9042:9042"
     volumes:
       - cassandra-data:/var/lib/cassandra
+      - /schema.cql:/schema.cql:ro
     environment:
       - CASSANDRA_START_RPC=true
       - CASSANDRA_CLUSTER_NAME=TochlyCluster
