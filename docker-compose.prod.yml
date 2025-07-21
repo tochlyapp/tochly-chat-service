@@ -35,6 +35,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s
+    networks:
+      - tochly_redis_net
 
 volumes:
   cassandra-data:
