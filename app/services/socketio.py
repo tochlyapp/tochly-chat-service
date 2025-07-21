@@ -14,7 +14,7 @@ from app.services.chat import (
     handle_direct_text_message,
 )
 
-from app.db.cassandra import session
+from app.db.cassandra import get_cassandra_session
 from app.schemas.data_validators import (
     StartChatValidator, 
     SendChatMessageValidator
@@ -22,6 +22,7 @@ from app.schemas.data_validators import (
 
 logger = get_logger('socketio')
 connected_cookies = {}
+session = get_cassandra_session()
 
 @sio.event
 async def connect(sid, environ):

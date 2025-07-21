@@ -7,7 +7,7 @@ from cassandra.util import uuid_from_time
 from cassandra.query import SimpleStatement
 from cassandra import ConsistencyLevel
 
-from app.db.cassandra import session
+from app.db.cassandra import get_cassandra_session
 from app.services.user import fetch_member_info
 
 from app.schemas.data_validators import SendChatMessageValidator
@@ -16,6 +16,7 @@ from app.schemas.data_classes import RoomDetailsParams
 from app.utils.logger import get_logger
 
 logger = get_logger('chat')
+session = get_cassandra_session()
 
 async def create_or_get_chat_room(team_id: str, user1_id: str, user2_id: str, cookies: Dict) -> str:
     try:

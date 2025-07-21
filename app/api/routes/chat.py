@@ -7,12 +7,13 @@ from fastapi import (
     Depends
 )
 
-from app.db.cassandra import session
+from app.db.cassandra import get_cassandra_session
 from app.services.chat import get_user_rooms
 from app.utils.auth import verify_cookies
 from app.schemas.data_validators import QueryParams, RoomMessagesQueryParams
 
 router = APIRouter()
+session = get_cassandra_session()
 
 @router.get('/api/chats/rooms')
 async def get_user_chat_rooms(
