@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: tochly_chat_server
+    container_name: tochly_chat_service
     ports:
       - "8001:8001"
     depends_on:
@@ -14,7 +14,7 @@ services:
     environment:
       - CONFIG_VALIDATION=strict
     networks:
-      - tochly_net
+      - tochly_redis_net
 
   cassandra:
     image: cassandra:4.1
@@ -39,5 +39,5 @@ volumes:
   cassandra-data:
 
 networks:
-  tochly_net:
+  tochly_redis_net:
     external: true
