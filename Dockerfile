@@ -16,5 +16,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 EXPOSE 8001
 
 # Run the server
-CMD ["./wait-for-it.sh", "redis:6379", "--timeout=30", "--strict", "--", \
-     "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
