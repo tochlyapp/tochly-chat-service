@@ -23,18 +23,17 @@ services:
       - "9042:9042"
     volumes:
       - cassandra-data:/var/lib/cassandra
-      # - ./schema/schema.cql:/schema.cql:ro
     environment:
       - CASSANDRA_START_RPC=true
       - CASSANDRA_CLUSTER_NAME=TochlyCluster
-      - MAX_HEAP_SIZE=512M
-      - HEAP_NEWSIZE=100M
+      - MAX_HEAP_SIZE=350M
+      - HEAP_NEWSIZE=64M
     healthcheck:
       test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 45s
 
 volumes:
   cassandra-data:
