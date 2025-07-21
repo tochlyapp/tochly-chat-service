@@ -27,8 +27,8 @@ services:
     environment:
       - CASSANDRA_START_RPC=true
       - CASSANDRA_CLUSTER_NAME=TochlyCluster
-      - MAX_HEAP_SIZE=350M
-      - HEAP_NEWSIZE=64M
+      - MAX_HEAP_SIZE=1024M
+      - HEAP_NEWSIZE=256M
     healthcheck:
       test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
       interval: 10s
