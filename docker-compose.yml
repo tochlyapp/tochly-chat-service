@@ -18,6 +18,7 @@ services:
   redis:
     image: redis:7
     container_name: tochly_redis_server
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
     ports:
       - "6379:6379"
     healthcheck:
@@ -34,7 +35,7 @@ services:
       - "9042:9042"
     volumes:
       - cassandra-data:/var/lib/cassandra
-      - /schema.cql:/schema.cql:ro
+      - /Users/AhmadAmeen/schema.cql:/schema.cql:ro
     environment:
       - CASSANDRA_START_RPC=true
       - CASSANDRA_CLUSTER_NAME=TochlyCluster

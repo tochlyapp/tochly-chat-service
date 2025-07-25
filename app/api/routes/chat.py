@@ -46,7 +46,7 @@ async def get_user_chat_rooms(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail=str(e)
         )
-    except Exception as ee:
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
             detail='Internal Server Error'
