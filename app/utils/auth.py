@@ -1,6 +1,10 @@
 from fastapi import HTTPException, status
 import aiohttp
+
 from app.config.settings import settings
+from app.utils.logger import get_logger
+
+logger = get_logger('socketio')
 
 def _normalize_cookies(cookies):
     if isinstance(cookies, dict):
@@ -16,4 +20,5 @@ async def verify_cookies(cookies):
             cookies=cookies_dict,
         ) as response:
             if response.status != 200:
+                logger.exception('Authentication Error:', response)
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
