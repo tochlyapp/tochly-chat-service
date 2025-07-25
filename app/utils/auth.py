@@ -20,4 +20,5 @@ async def verify_cookies(cookies):
             cookies=cookies_dict,
         ) as response:
             if response.status != 200:
+                print('Authentication Error: ', response)
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
