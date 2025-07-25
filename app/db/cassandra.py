@@ -11,7 +11,7 @@ def get_cassandra_session(max_retries=10, delay=5):
 
     for attempt in range(1, max_retries + 1):
         try:
-            cluster = Cluster(['cassandra'])  # Optionally use env var
+            cluster = Cluster(['cassandra'])
             session = cluster.connect()
             session.set_keyspace('tochly')
             _session = session
