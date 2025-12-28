@@ -7,8 +7,8 @@ services:
     depends_on:
       cassandra:
         condition: service_healthy
-    volumes:
-      - .:/app
+    # volumes:
+    #   - .:/app
     env_file:
       - .env
     environment:
@@ -19,11 +19,12 @@ services:
   cassandra:
     image: cassandra:4.1
     container_name: tochly_cassandra_server
-    ports:
-      - "9042:9042"
+    # ports:
+    #   - "9042:9042"
     volumes:
       - cassandra-data:/var/lib/cassandra
-      - /schema.cql:/schema.cql:ro
+      - ./schema.cql:/schema.cql:ro
+    command: ["sh", "-c", "sleep 10 && cqlsh cassandra -f /schema.cql"]
     environment:
       - CASSANDRA_START_RPC=true
       - CASSANDRA_CLUSTER_NAME=TochlyCluster

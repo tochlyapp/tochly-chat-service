@@ -15,12 +15,12 @@ def get_cassandra_session(max_retries=10, delay=5):
             session = cluster.connect()
             session.set_keyspace('tochly')
             _session = session
-            print("[Cassandra] Connected successfully.")
+            print('[Cassandra] Connected successfully.')
             return _session
         except NoHostAvailable as e:
-            print(f"[Cassandra Retry {attempt}] No host available: {e}")
+            print(f'[Cassandra Retry {attempt}] No host available: {e}')
         except Exception as e:
-            print(f"[Cassandra Retry {attempt}] Unexpected error: {e}")
+            print(f'[Cassandra Retry {attempt}] Unexpected error: {e}')
         time.sleep(delay)
 
-    raise Exception("Cassandra not reachable after multiple retries")
+    raise Exception('Cassandra not reachable after multiple retries')

@@ -35,7 +35,6 @@ services:
       - "9042:9042"
     volumes:
       - cassandra-data:/var/lib/cassandra
-      - /Users/AhmadAmeen/schema.cql:/schema.cql:ro
     environment:
       - CASSANDRA_START_RPC=true
       - CASSANDRA_CLUSTER_NAME=TochlyCluster
@@ -45,6 +44,15 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+
+  cassandra-init:
+    image: cassandra:4.1
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./schema.cql:/schema.cql:ro
+    entrypoint: ["sh", "-c", "sleep 10 && cqlsh cassandra -f /schema.cql"]
 
 volumes:
   cassandra-data:

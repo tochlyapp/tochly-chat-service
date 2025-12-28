@@ -4,7 +4,7 @@ from socketio import ASGIApp
 
 from .sio_server import sio, origins
 from .services import socketio
-from .api.routes import chat
+from .api.routes import chat, prekeys
 
 fastapi_app = FastAPI(
     docs_url='/api/docs',
@@ -21,6 +21,7 @@ fastapi_app.add_middleware(
 )
 
 fastapi_app.include_router(chat.router)
+fastapi_app.include_router(prekeys.router)
 
 app = ASGIApp(
     socketio_server=sio,

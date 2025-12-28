@@ -1,7 +1,7 @@
 
 CREATE KEYSPACE tochly WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
 
-CREATE TABLE tochly.chat_rooms (
+CREATE TABLE IF NOT EXISTS tochly.chat_rooms (
     team_id text,
     room_id text,
     created_at timestamp,
@@ -27,7 +27,7 @@ CREATE TABLE tochly.chat_rooms (
     AND read_repair = 'BLOCKING'
     AND speculative_retry = '99p';
 
-CREATE TABLE tochly.direct_messages (
+CREATE TABLE IF NOT EXISTS tochly.direct_messages (
     room_id text,
     message_id timeuuid,
     attachment_url text,
@@ -59,7 +59,7 @@ CREATE TABLE tochly.direct_messages (
     AND read_repair = 'BLOCKING'
     AND speculative_retry = '99p';
 
-CREATE TABLE tochly.group_members (
+CREATE TABLE IF NOT EXISTS tochly.group_members (
     group_id uuid,
     user_id text,
     group_name text,
@@ -84,7 +84,7 @@ CREATE TABLE tochly.group_members (
     AND read_repair = 'BLOCKING'
     AND speculative_retry = '99p';
 
-CREATE TABLE tochly.group_messages (
+CREATE TABLE IF NOT EXISTS tochly.group_messages (
     group_id uuid,
     message_id timeuuid,
     content text,
@@ -110,7 +110,7 @@ CREATE TABLE tochly.group_messages (
     AND read_repair = 'BLOCKING'
     AND speculative_retry = '99p';
 
-CREATE TABLE tochly.user_chats_by_user (
+CREATE TABLE IF NOT EXISTS tochly.user_chats_by_user (
     team_id text,
     user_id text,
     room_id text,
@@ -139,3 +139,29 @@ CREATE TABLE tochly.user_chats_by_user (
     AND min_index_interval = 128
     AND read_repair = 'BLOCKING'
     AND speculative_retry = '99p';
+
+CREATE TABLE IF NOT EXISTS tochly.prekeys_by_user_device (
+    user_id text,
+    device_id uuid,
+    identity_key text,
+    last_updated timestamp,
+    registration_id int,
+    signature text,
+    signed_at timestamp,
+    signed_prekey text,
+    signed_prekey_id int,
+    PRIMARY KEY (user_id, device_id)
+) WITH CLUSTERING ORDER BY (device_id ASC)
+
+CREATE TABLE IF NOT EXISTS tochly.one_time_prekeys_by_user_device (
+    user_id TEXT,
+    device_id UUID,
+    prekey_id INT,
+    prekey TEXT,
+    used BOOLEAN,
+    uploaded_at TIMESTAMP,
+    PRIMARY KEY ((user_id, device_id), prekey_id)
+) WITH CLUSTERING ORDER BY (prekey_id ASC);
+
+CREATE INDEX IF NOT EXISTS idx_used_prekey
+ON one_time_prekeys_by_user_device (used);
