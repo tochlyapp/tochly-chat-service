@@ -5,8 +5,8 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      cassandra:
-        condition: service_healthy
+      cassandra-init:
+        condition: service_completed_successfully
     volumes:
       - .:/app
     env_file:
@@ -38,6 +38,25 @@ services:
       start_period: 40s
     networks:
       - tochly_redis_net
+
+  cassandra-init:
+    image: cassandra:4.1
+    container_name: tochly_cassandra_init
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./schema.cql:/schema.cql:ro
+    command: >
+      bash -c "
+        echo 'Waiting for Cassandra to be ready...'
+        sleep 10
+        cqlsh cassandra -f /schema.cql
+        echo 'Schema initialized successfully'
+      "
+    networks:
+      - tochly_redis_net
+    restart: "no"
 
 volumes:
   cassandra-data:
