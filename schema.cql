@@ -1,6 +1,8 @@
 
 CREATE KEYSPACE tochly WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
 
+USE tochly;
+
 CREATE TABLE IF NOT EXISTS tochly.chat_rooms (
     team_id text,
     room_id text,
