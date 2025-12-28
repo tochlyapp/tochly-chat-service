@@ -24,7 +24,7 @@ services:
     volumes:
       - cassandra-data:/var/lib/cassandra
       - ./schema.cql:/schema.cql:ro
-    # entrypoint: ["sh", "-c", "sleep 30 && cqlsh cassandra -f /schema.cql"]
+    entrypoint: ["sh", "-c", "sleep 20 && cqlsh < schema.cql"]
     environment:
       - CASSANDRA_START_RPC=true
       - CASSANDRA_CLUSTER_NAME=TochlyCluster

@@ -1,6 +1,6 @@
--- Create keyspace if not exists
+-- Create keyspace if it doesn't exist
 CREATE KEYSPACE IF NOT EXISTS tochly 
-WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'} 
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1} 
 AND durable_writes = true;
 
 -- Use the keyspace
